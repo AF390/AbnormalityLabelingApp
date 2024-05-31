@@ -34,6 +34,9 @@ function videoLabelingApp(fpath_to_video)
     % Initialize a data structure to store frame ratings
     ratings = zeros(video.NumFrames, 1);
     
+    % Variable to control playback
+    isPlaying = false;
+    
     % Update frame display
     function updateFrame(~, ~)
         frameNumber = round(frameSlider.Value);
@@ -45,7 +48,8 @@ function videoLabelingApp(fpath_to_video)
     
     % Play video function
     function playVideo(~, ~)
-        while hasFrame(video)
+        isPlaying = true;
+        while hasFrame(video) && isPlaying
             frame = readFrame(video);
             imshow(frame, 'Parent', ax);
             frameSlider.Value = video.CurrentTime * video.FrameRate;
@@ -59,6 +63,7 @@ function videoLabelingApp(fpath_to_video)
     
     % Quit and save data function
     function quitApp(~, ~)
+        isPlaying = false;  % Stop the playback
         frameNumber = round(frameSlider.Value);
         ratings(frameNumber) = ratingSlider.Value;
         T = table((1:video.NumFrames)', ratings, 'VariableNames', {'FrameNumber', 'Rating'});
