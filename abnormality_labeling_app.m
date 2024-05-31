@@ -1,6 +1,6 @@
-function videoLabelingApp(fpath_to_video)
+function abnormality_labeling_app(fpath_to_video)
     % Create the main figure
-    fig = uifigure('Name', 'MATLAB App');
+    fig = uifigure('Name', 'MATLAB App', 'Position', [100, 100, 800, 500]);
     
     % Create the axes for video display
     ax = uiaxes(fig, 'Position', [20, 150, 640, 360]);
@@ -18,15 +18,19 @@ function videoLabelingApp(fpath_to_video)
         'Text', 'Level of abnormality');
     
     % Create the play button
-    playButton = uibutton(fig, 'Text', 'Play', 'Position', [20, 20, 100, 30], ...
+    playButton = uibutton(fig, 'Text', 'Play', 'Position', [680, 320, 100, 30], ...
         'ButtonPushedFcn', @playVideo);
     
+    % Create the save button
+    saveButton = uibutton(fig, 'Text', 'Save', 'Position', [680, 280, 100, 30], ...
+        'ButtonPushedFcn', @saveData);
+    
     % Create the quit button
-    quitButton = uibutton(fig, 'Text', 'Quit', 'Position', [560, 20, 100, 30], ...
+    quitButton = uibutton(fig, 'Text', 'Quit', 'Position', [680, 240, 100, 30], ...
         'ButtonPushedFcn', @quitApp);
     
     % Create a label to display the current frame number
-    frameLabel = uilabel(fig, 'Position', [680, 100, 100, 22], 'Text', 'Frame number: 1');
+    frameLabel = uilabel(fig, 'Position', [680, 200, 100, 22], 'Text', 'Frame number: 1');
     
     % Initialize the video reader
     video = VideoReader(fpath_to_video);
@@ -59,6 +63,17 @@ function videoLabelingApp(fpath_to_video)
             pause(1 / video.FrameRate);
             drawnow;  % Allow UI to update
         end
+    end
+    
+    % Save data function
+    function saveData(~, ~)
+        isPlaying = false;  % Stop the playback
+        frameNumber = round(frameSlider.Value);
+        ratings(frameNumber) = ratingSlider.Value;
+        T = table((1:video.NumFrames)', ratings, 'VariableNames', {'FrameNumber', 'Rating'});
+        writetable(T, 'frame_ratings.csv');
+        isPlaying = true;  % Resume playback
+        playVideo();  % Call playVideo to continue playback
     end
     
     % Quit and save data function
