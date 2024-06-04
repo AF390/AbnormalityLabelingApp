@@ -23,6 +23,16 @@ function abnormality_labeling_app(fpath_to_video)
     ratingLabel = uilabel(fig, 'Position', [680, 400, 100, 22], ...
         'Text', 'Suspiciousness');
     
+    speed_labels=0:2:10; speed_labels(1)=0.1;
+    % Create the slider for playback speed control
+    speedSlider = uislider(fig, 'Position', [680, 450, 150, 3], ...
+        'Limits', [0.1, 10], 'Value', 1, ...
+        'MajorTicks', speed_labels);
+        % 'MajorTickLabels', {'0.1', '0.6', '1.1', '1.6', '2.1', '2.6', '3'} ...
+        % );
+    speedLabel = uilabel(fig, 'Position', [680, 470, 150, 22], ...
+        'Text', 'Playback Speed');
+    
     % Create the play button
     playButton = uibutton(fig, 'Text', 'Play', 'Position', [680, 320, 100, 30], ...
         'ButtonPushedFcn', @playVideo);
@@ -36,7 +46,7 @@ function abnormality_labeling_app(fpath_to_video)
         'ButtonPushedFcn', @quitApp);
     
     % Create a label to display the current frame number
-    frameLabel = uilabel(fig, 'Position', [680, 200, 100, 22], 'Text', 'Frame number: 1');
+    frameLabel = uilabel(fig, 'Position', [680, 200, 150, 22], 'Text', 'Frame number: 1');
     
     % Initialize a data structure to store frame ratings
     ratings = zeros(video.NumFrames, 1);
@@ -73,7 +83,7 @@ function abnormality_labeling_app(fpath_to_video)
             frameSlider.Value = frameNumber;
             frameLabel.Text = ['Frame number: ', num2str(frameNumber)];
             ratings(frameNumber) = ratingSlider.Value;
-            pause(1 / video.FrameRate);
+            pause(1 / (video.FrameRate * speedSlider.Value));  % Adjust playback speed
             drawnow;  % Allow UI to update
         end
     end
@@ -85,8 +95,6 @@ function abnormality_labeling_app(fpath_to_video)
         ratings(frameNumber) = ratingSlider.Value;
         T = table((1:video.NumFrames)', ratings, 'VariableNames', {'FrameNumber', 'Rating'});
         writetable(T, 'frame_ratings.csv');
-        isPlaying = true;  % Resume playback
-        playVideo();  % Call playVideo to continue playback
     end
     
     % Quit and save data function
