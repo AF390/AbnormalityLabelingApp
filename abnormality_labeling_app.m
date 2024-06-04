@@ -38,7 +38,7 @@ function abnormality_labeling_app(fpath_to_video)
         'ButtonPushedFcn', @playVideo);
     
     % Create the save button
-    saveButton = uibutton(fig, 'Text', 'Save', 'Position', [680, 280, 100, 30], ...
+    saveButton = uibutton(fig, 'Text', 'Pause & save', 'Position', [680, 280, 100, 30], ...
         'ButtonPushedFcn', @saveData);
     
     % Create the quit button
